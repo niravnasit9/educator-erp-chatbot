@@ -6,14 +6,14 @@ import Link from "next/link";
 import { db } from "@/lib/firebase";
 import { collection, onSnapshot, query, doc, updateDoc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
-import { 
-  Search, 
-  LogOut, 
-  Menu, 
-  X, 
+import {
+  Search,
+  LogOut,
+  Menu,
+  X,
   AlertCircle,
-  CheckCircle2, 
-  MessageSquare, 
+  CheckCircle2,
+  MessageSquare,
   Headphones,
   BellRing,
   Clock,
@@ -93,8 +93,8 @@ export function getLastMessageSenderInfo(session: ClientSession): {
   const sender = (session.lastMessageSender || "").toLowerCase().trim();
   const senderName = (session.lastMessageSenderName || "").trim();
 
-  if (sender === "support" || sender === "specialist" || senderName.toLowerCase().includes("specialist")) {
-    return { role: "support", label: senderName ? "Support (" + senderName + ")" : "Support" };
+  if (sender === "support" || sender === "specialist" || senderName.toLowerCase().includes("specialist") || senderName.toLowerCase().includes("member") || sender === "member") {
+    return { role: "support", label: "Support Member" };
   }
   if (sender === "ai" || sender === "assistant" || sender === "bot") {
     return { role: "ai", label: "AI" };
@@ -111,7 +111,7 @@ export function getLastMessageSenderInfo(session: ClientSession): {
     return { role: "client", label: "Client" };
   }
   if ((session.unreadByClient || 0) > 0) {
-    return { role: "support", label: session.assignedTo ? "Support (" + session.assignedTo + ")" : "Support" };
+    return { role: "support", label: "Support Member" };
   }
   if (!isRealTicket(session) && session.status === "active") {
     return { role: "ai", label: "AI" };
@@ -200,7 +200,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
       try {
         setUser(JSON.parse(stored));
       } catch (e) {
-        setUser({ userName: "Specialist", teamName: "Support Team" });
+        setUser({ userName: "Support Member", teamName: "Support Team" });
       }
     }
   }, [router]);
@@ -472,7 +472,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
               <span className="text-[10px] leading-tight block">All</span>
               <span className="text-[9.5px] opacity-80 font-mono">({appFilteredSessions.length})</span>
             </button>
-            
+
             <button
               onClick={() => setFilterTab("generated")}
               className={cn(
@@ -550,8 +550,8 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
               const senderInfo = getLastMessageSenderInfo(session);
 
               const displayName = session.clientName || session.instituteName || session.id.replace(/_/g, " ");
-              const displayTicketId = session.ticketId 
-                ? (session.ticketId.startsWith("#") ? session.ticketId : "#" + session.ticketId) 
+              const displayTicketId = session.ticketId
+                ? (session.ticketId.startsWith("#") ? session.ticketId : "#" + session.ticketId)
                 : null;
 
               const isMiniPartner = (session.appCategory || session.sourceApp || "").toLowerCase().includes("minipartner");
@@ -569,12 +569,12 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                       isActive
                         ? "bg-[#5B61F5]/15 border-[#5B61F5]/40 shadow-xs"
                         : hasTicket && status === "generated"
-                        ? "bg-amber-950/20 border-amber-500/30 hover:bg-slate-800/60"
-                        : hasTicket && status === "working"
-                        ? "bg-blue-950/20 border-blue-500/25 hover:bg-slate-800/60"
-                        : hasTicket && status === "pending"
-                        ? "bg-orange-950/20 border-orange-500/25 hover:bg-slate-800/60"
-                        : "bg-slate-800/30 border-transparent hover:bg-slate-800/70"
+                          ? "bg-amber-950/20 border-amber-500/30 hover:bg-slate-800/60"
+                          : hasTicket && status === "working"
+                            ? "bg-blue-950/20 border-blue-500/25 hover:bg-slate-800/60"
+                            : hasTicket && status === "pending"
+                              ? "bg-orange-950/20 border-orange-500/25 hover:bg-slate-800/60"
+                              : "bg-slate-800/30 border-transparent hover:bg-slate-800/70"
                     )}
                   >
                     <div className="flex items-start gap-2.5">
@@ -585,12 +585,12 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
                           !hasTicket
                             ? "bg-slate-700 text-slate-200"
                             : status === "generated"
-                            ? "bg-amber-500 text-slate-950"
-                            : status === "working"
-                            ? "bg-blue-600 text-white"
-                            : status === "pending"
-                            ? "bg-orange-500 text-white"
-                            : "bg-emerald-600 text-white"
+                              ? "bg-amber-500 text-slate-950"
+                              : status === "working"
+                                ? "bg-blue-600 text-white"
+                                : status === "pending"
+                                  ? "bg-orange-500 text-white"
+                                  : "bg-emerald-600 text-white"
                         )}
                       >
                         {displayName.charAt(0).toUpperCase()}
@@ -761,7 +761,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
               <p className="text-xs font-semibold text-white truncate leading-tight">
                 {user.userName}
               </p>
-              <p className="text-[10px] text-slate-400 truncate leading-tight">{user.teamName || "Support Specialist"}</p>
+              <p className="text-[10px] text-slate-400 truncate leading-tight">{user.teamName || "Support Member"}</p>
             </div>
           </div>
 

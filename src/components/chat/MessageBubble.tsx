@@ -17,10 +17,12 @@ export function MessageBubble({
   message,
   showAvatar = true,
   onDelete,
+  clientFallbackName,
 }: {
   message: Message;
   showAvatar?: boolean;
   onDelete?: () => void;
+  clientFallbackName?: string;
 }) {
   const senderLower = (message.sender || "").toLowerCase().trim();
   const senderNameLower = (message.senderName || "").toLowerCase().trim();
@@ -68,7 +70,13 @@ export function MessageBubble({
       <div className="w-full flex justify-center my-2.5 group">
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-200/90 border border-slate-300 text-slate-700 rounded-full text-[11px] font-medium shadow-2xs">
           <Info size={12} className="text-[#5B61F5] shrink-0" />
-          <span className="leading-snug">{message.text}</span>
+          <span className="leading-snug">
+            {message.text
+              ?.replace(/\bSupport Specialist\b/gi, "Support Member")
+              ?.replace(/\bSpecialist\b/gi, "Support Member")
+              ?.replace(/\bSupport Agent\b/gi, "Support Member")
+              ?.replace(/\bAgent\b/gi, "Support Member")}
+          </span>
           <span className="text-[9.5px] text-slate-500 font-mono ml-1">{timeString}</span>
           {onDelete && (
             <button
@@ -136,7 +144,7 @@ export function MessageBubble({
               {isClient && (
                 <>
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  <span className="truncate">{message.senderName || "Client"}</span>
+                  <span className="truncate">{message.senderName || clientFallbackName || "Client"}</span>
                   <span className="text-[9.5px] font-semibold bg-emerald-100/80 text-emerald-800 px-1.5 py-0.2 rounded border border-emerald-200 ml-auto shrink-0">
                     Client
                   </span>
@@ -154,7 +162,7 @@ export function MessageBubble({
               {isSupport && (
                 <>
                   <Headphones size={11} className="text-white shrink-0" />
-                  <span className="truncate">{message.senderName || "Support Specialist"}</span>
+                  <span className="truncate">Support Member</span>
                   <span className="text-[9.5px] font-semibold bg-white/20 text-white px-1.5 py-0.2 rounded ml-auto shrink-0">
                     Support
                   </span>
